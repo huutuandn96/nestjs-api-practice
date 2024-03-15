@@ -95,6 +95,73 @@ describe('App EndToEnd tests', () => {
     })
   })
 
+  describe('Note', () => {
+    describe('Insert Note', () => {
+      it('insert first note successfully', () => {
+        return pactum.spec()
+          .post('/notes')
+          .withBearerToken('$S{accessToken}')
+          .withBody({
+            title: 'Title 1',
+            description: 'Description 1',
+            url: 'example1.com'
+          })
+          .expectStatus(201)
+          .stores('noteId01', 'id')
+      })
+
+      it('insert second note successfully', () => {
+        return pactum.spec()
+          .post('/notes')
+          .withBearerToken('$S{accessToken}')
+          .withBody({
+            title: 'Title 2',
+            description: 'Description 2',
+            url: 'example2.com'
+          })
+          .expectStatus(201)
+          .stores('noteId02', 'id')
+      })
+    })
+
+    describe('Get Note Detail', () => {
+      it('get first note detail', () => {
+        return pactum.spec()
+          .get('/notes/{note_id}')
+          .withBearerToken('$S{accessToken}')
+          .withPathParams('note_id', '$S{noteId01}')
+          .expectStatus(200)
+      })
+
+      it('get note detail failed', () => {
+        return pactum.spec()
+          .get('/notes/{note_id}')
+          .withBearerToken('$S{accessToken}')
+          .withPathParams('note_id', 0)
+          .expectStatus(404)
+      })
+    })
+
+    describe('Get List Notes', () => {
+      it('Get list successfully', () => {
+        return pactum.spec()
+          .get('/notes')
+          .withBearerToken('$S{accessToken}')
+          .expectStatus(200)
+      })
+    })
+
+    describe('Delete Note', () => {
+      it('Delete successfully', () => {
+        return pactum.spec()
+          .delete('/notes')
+          .withBearerToken('$S{accessToken}')
+          .withQueryParams('id', '$S{noteId02}')
+          .expectStatus(204)
+      })
+    })
+  })
+
   afterAll(async () => {
     app.close()
   })
